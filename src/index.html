@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LagBreaker Pro</title>
+  <script type="module" src="main.js" defer></script>
+  <style>
+    /* БАЗОВАЯ ТЕМА (CYBER PINK - С ПРАВОГО ЭКРАНА СКРИНШОТА) */
+    :root, body[data-theme="pink"] {
+      --bg-app: #080312; 
+      --bg-gradient-top: #260d47;
+      --bg-panel: #100720; 
+      --bg-card: rgba(29, 14, 54, 0.75);
+      --bg-stat: rgba(42, 21, 77, 0.6);
+      --accent: #ff3b9a; 
+      --accent-glow: rgba(255, 59, 154, 0.45);
+      --accent-dim: rgba(255, 59, 154, 0.16);
+      --secondary-icon: #33e1ed;
+      --text-main: #ffffff; 
+      --text-muted: #9e8fb8;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    /* ЗОЛОТАЯ ТЕМА (С ЦЕНТРАЛЬНОГО ЭКРАНА СКРИНШОТА) */
+    body[data-theme="gold"] {
+      --bg-app: #0a0804; 
+      --bg-gradient-top: #2b230d;
+      --bg-panel: #120f07; 
+      --bg-card: rgba(33, 28, 15, 0.8);
+      --bg-stat: rgba(48, 40, 20, 0.6);
+      --accent: #f7c948; 
+      --accent-glow: rgba(247, 201, 72, 0.4);
+      --accent-dim: rgba(247, 201, 72, 0.15);
+      --secondary-icon: #f7c948;
+      --text-main: #ffffff; 
+      --text-muted: #a69c80;
+      --border: rgba(247, 201, 72, 0.1);
+    }
+
+    /* ОРАНЖЕВАЯ ТЕМА (С ЛЕВОГО ЭКРАНА СКРИНШОТА) */
+    body[data-theme="orange"] {
+      --bg-app: #0d0502; 
+      --bg-gradient-top: #361708;
+      --bg-panel: #140904; 
+      --bg-card: rgba(38, 18, 9, 0.8);
+      --bg-stat: rgba(56, 26, 12, 0.6);
+      --accent: #ff8c3b; 
+      --accent-glow: rgba(255, 140, 59, 0.45);
+      --accent-dim: rgba(255, 140, 59, 0.15);
+      --secondary-icon: #ff8c3b;
+      --text-main: #ffffff; 
+      --text-muted: #b08d78;
+      --border: rgba(255, 140, 59, 0.1);
+    }
+
+    /* ИЗУМРУДНАЯ ТЕМА (КЛАССИЧЕСКАЯ LAGBREAKER) */
+    body[data-theme="green"] {
+      --bg-app: #050505; 
+      --bg-gradient-top: #0d261a;
+      --bg-panel: #0d0d0f; 
+      --bg-card: #141417;
+      --bg-stat: #1a1a1f;
+      --accent: #00ff88; 
+      --accent-glow: rgba(0, 255, 136, 0.4);
+      --accent-dim: rgba(0, 255, 136, 0.15);
+      --secondary-icon: #00ff88;
+      --text-main: #ffffff; 
+      --text-muted: #8b8b99;
+      --border: rgba(255, 255, 255, 0.07);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+      background-color: var(--bg-app);
+      color: var(--text-main); 
+      height: 100vh; 
+      overflow: hidden;
+      display: flex; 
+      user-select: none;
+      transition: background-color 0.35s ease;
+    }
+
+    /* САЙДБАР */
+    .sidebar {
+      width: 245px; 
+      background: var(--bg-panel); 
+      border-right: 1px solid var(--border);
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+      padding: 24px; 
+      z-index: 10;
+      transition: background 0.35s ease;
+    }
+
+    .brand {
+      font-size: 1.4rem; 
+      font-weight: 800; 
+      letter-spacing: -0.5px;
+      margin-bottom: 40px; 
+      display: flex; 
+      align-items: center; 
+      gap: 10px;
+    }
+
+    .brand svg { 
+      color: var(--accent); 
+      transition: color 0.3s;
+    }
+
+    .nav-menu { 
+      list-style: none; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+    }
+
+    .nav-item {
+      padding: 12px 16px; 
+      border-radius: 10px; 
+      color: var(--text-muted);
+      font-weight: 600; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center;
+      gap: 12px; 
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover { 
+      color: var(--text-main); 
+      background: rgba(255, 255, 255, 0.04); 
+    }
+
+    .nav-item.active { 
+      background: var(--accent-dim); 
+      color: var(--accent); 
+    }
+
+    /* БЫСТРЫЙ ВЫБОР ТЕМЫ В САЙДБАРЕ */
+    .sidebar-themes {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .sidebar-themes-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .theme-dots {
+      display: flex;
+      gap: 12px;
+    }
+
+    .theme-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-dot:hover {
+      transform: scale(1.12);
+    }
+
+    .theme-dot.active {
+      border-color: #ffffff;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ГЛАВНЫЙ КОНТЕНТ */
+    .main-content {
+      flex: 1; 
+      padding: 30px 40px;
+      background: radial-gradient(circle at 50% 0%, var(--bg-gradient-top) 0%, var(--bg-app) 75%);
+      position: relative; 
+      overflow-y: auto;
+      transition: background 0.35s ease;
+    }
+    
+    .view-section { 
+      display: none; 
+      flex-direction: column; 
+      height: 100%; 
+      animation: fadeIn 0.25s ease; 
+    }
+
+    .view-section.active { 
+      display: flex; 
+    }
+
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(8px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* ДОБАВЛЕННЫЕ АНИМАЦИИ ПУЛЬСАЦИИ И БУСТА */
+    @keyframes neonPulse {
+      0% {
+        box-shadow: 0 0 10px var(--accent), inset 0 0 10px var(--accent);
+      }
+      50% {
+        box-shadow: 0 0 25px var(--accent), inset 0 0 15px var(--accent);
+      }
+      100% {
+        box-shadow: 0 0 10px var(--accent), inset 0 0 10px var(--accent);
+      }
+    }
+
+    body.is-boosted #boost-btn {
+      animation: neonPulse 2s infinite ease-in-out;
+      border-color: var(--accent);
+    }
+
+    .header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-end; 
+      margin-bottom: 28px; 
+    }
+
+    .game-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .game-title { 
+      font-size: 2.2rem; 
+      font-weight: 800; 
+      letter-spacing: -1px; 
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .game-title option {
+      background: var(--bg-panel);
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    /* КНОПКА ЗАПУСКА ИГРЫ */
+    .launch-btn {
+      background: var(--accent);
+      color: #08050a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.2s ease;
+    }
+
+    .launch-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 6px 25px var(--accent-glow);
+    }
+
+    .launch-btn:active {
+      transform: translateY(0);
+    }
+
+    .launch-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .controls-row { 
+      display: flex; 
+      gap: 12px; 
+    }
+
+    .selector {
+      background: var(--bg-card); 
+      border: 1px solid var(--border); 
+      color: var(--text-main);
+      padding: 10px 16px; 
+      border-radius: 10px; 
+      font-family: inherit; 
+      font-weight: 600;
+      outline: none; 
+      min-width: 170px; 
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .selector option {
+      background: var(--bg-panel);
+      color: var(--text-main);
+    }
+
+    /* СЕТКА ДАШБОРДА */
+    .dashboard-grid { 
+      display: grid; 
+      grid-template-columns: 310px 1fr; 
+      grid-template-rows: auto 1fr; 
+      gap: 20px; 
+      height: 100%; 
+    }
+
+    .card { 
+      background: var(--bg-card); 
+      border: 1px solid var(--border); 
+      border-radius: 18px; 
+      padding: 24px; 
+      position: relative; 
+      overflow: hidden; 
+      backdrop-filter: blur(12px);
+      transition: background 0.35s ease, border-color 0.35s ease;
+    }
+
+    .card-title { 
+      font-size: 0.85rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+      margin-bottom: 20px; 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+
+    /* КНОПКА БУСТА В СТИЛЕ СКРИНШОТА */
+    .boost-card { 
+      grid-column: 1; 
+      grid-row: 1 / 3; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      text-align: center; 
+    }
+
+    .power-btn-wrap { 
+      position: relative; 
+      margin-bottom: 42px; 
+      padding: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+    }
+
+    .power-btn {
+      width: 145px; 
+      height: 145px; 
+      border-radius: 50%; 
+      border: 6px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(0,0,0,0.4));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      color: var(--accent); 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+      z-index: 2; 
+      position: relative;
+    }
+
+    .power-btn svg { 
+      width: 52px; 
+      height: 52px; 
+      transition: all 0.3s; 
+    }
+
+    .ripple { 
+      position: absolute; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, -50%); 
+      width: 145px; 
+      height: 145px; 
+      border-radius: 50%; 
+      border: 2px solid var(--accent); 
+      opacity: 0; 
+      z-index: 1; 
+      pointer-events: none;
+    }
+
+    .power-btn.active { 
+      color: #12061c; 
+      background: var(--accent); 
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 50px var(--accent-glow), inset 0 2px 6px rgba(255,255,255,0.4); 
+      transform: scale(1.03);
+    }
+
+    .power-btn.active + .ripple { 
+      animation: ping-ripple 2s infinite cubic-bezier(0, 0, 0.2, 1); 
+    }
+
+    @keyframes ping-ripple { 
+      0% { width: 145px; height: 145px; opacity: 0.8; }
+      100% { width: 250px; height: 250px; opacity: 0; } 
+    }
+
+    .status-text { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      margin-bottom: 8px; 
+    }
+
+    .status-sub { 
+      color: var(--text-muted); 
+      font-size: 0.9rem; 
+      line-height: 1.4;
+      padding: 0 10px;
+    }
+
+    /* МАРШРУТИЗАЦИЯ И ТЕЛЕМЕТРИЯ */
+    .network-card { 
+      grid-column: 2; 
+      grid-row: 1; 
+    }
+
+    .route-visual { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 20px 10px; 
+      margin-top: 10px; 
+    }
+
+    .node { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 10px; 
+      z-index: 2; 
+    }
+
+    .node-icon { 
+      width: 52px; 
+      height: 52px; 
+      border-radius: 14px; 
+      background: var(--bg-stat); 
+      border: 1px solid var(--border); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.3s; 
+    }
+
+    .node-label { 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      color: var(--text-muted); 
+    }
+
+    .line-container { 
+      flex: 1; 
+      height: 3px; 
+      background: var(--border); 
+      margin: 0 15px; 
+      position: relative; 
+      top: -14px; 
+      border-radius: 2px;
+    }
+
+    .line-fill { 
+      height: 100%; 
+      width: 0%; 
+      background: var(--accent); 
+      box-shadow: 0 0 12px var(--accent); 
+      transition: width 0.5s ease; 
+    }
+
+    .ping-badge { 
+      position: absolute; 
+      top: -26px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: var(--bg-panel); 
+      padding: 4px 10px; 
+      border-radius: 6px; 
+      font-family: monospace; 
+      font-size: 0.75rem; 
+      border: 1px solid var(--border); 
+      opacity: 0; 
+      transition: opacity 0.3s; 
+    }
+
+    .stats-card { 
+      grid-column: 2; 
+      grid-row: 2; 
+      display: flex; 
+      flex-direction: column; 
+    }
+
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 15px; 
+      margin-bottom: 20px; 
+    }
+
+    .stat-box { 
+      background: var(--bg-stat); 
+      padding: 15px; 
+      border-radius: 12px; 
+      border: 1px solid var(--border);
+    }
+
+    .stat-val { 
+      font-family: monospace; 
+      font-size: 1.5rem; 
+      font-weight: 700; 
+      margin-top: 5px; 
+      color: var(--text-main); 
+    }
+
+    .chart-container { 
+      flex: 1; 
+      display: flex; 
+      align-items: flex-end; 
+      gap: 4px; 
+      padding-top: 20px; 
+      height: 100%; 
+    }
+
+    .bar { 
+      flex: 1; 
+      background: var(--border); 
+      border-radius: 4px 4px 0 0; 
+      transition: height 0.2s, background 0.3s; 
+      min-height: 5%; 
+    }
+
+    /* АКТИВНЫЙ БУСТ */
+    body.is-boosted .node-icon { 
+      background: var(--accent-dim); 
+      border-color: var(--accent); 
+      color: var(--accent); 
+    }
+    body.is-boosted .node-label { 
+      color: var(--text-main); 
+    }
+    body.is-boosted .line-fill { 
+      width: 100%; 
+    }
+    body.is-boosted .ping-badge { 
+      opacity: 1; 
+    }
+    body.is-boosted .bar { 
+      background: var(--accent); 
+      opacity: 0.8; 
+    }
+
+    /* БИБЛИОТЕКА ИГР */
+    .games-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+      gap: 20px; 
+      margin-top: 20px; 
+    }
+
+    .game-card { 
+      background: var(--bg-card); 
+      border: 1px solid var(--border); 
+      border-radius: 14px; 
+      padding: 16px; 
+      text-align: center; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+    }
+
+    .game-card:hover { 
+      border-color: var(--accent); 
+      transform: translateY(-5px); 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.35); 
+    }
+
+    .game-card h3 { 
+      margin-top: 14px; 
+      font-size: 1.1rem; 
+    }
+
+    .game-card-sub {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .game-banner { 
+      height: 115px; 
+      border-radius: 10px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+      position: relative; 
+    }
+
+    .game-banner svg { 
+      max-height: 52px; 
+      max-width: 80%; 
+      fill: white; 
+      opacity: 0.95; 
+      transition: transform 0.3s ease; 
+    }
+
+    .game-card:hover .game-banner svg { 
+      transform: scale(1.15); 
+      opacity: 1; 
+    }
+
+    /* КАРТОЧКИ ВЫБОРА ТЕМ В НАСТРОЙКАХ */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 15px;
+      margin-bottom: 25px;
+    }
+
+    .theme-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .theme-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .theme-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-dim);
+    }
+
+    .theme-preview {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .theme-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .settings-list { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+    }
+
+    .setting-item { 
+      background: var(--bg-card); 
+      border: 1px solid var(--border); 
+      border-radius: 12px; 
+      padding: 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+
+    .toggle { 
+      width: 50px; 
+      height: 26px; 
+      background: #1c1c22; 
+      border-radius: 20px; 
+      position: relative; 
+      cursor: pointer; 
+      transition: background 0.3s; 
+    }
+
+    .toggle::after { 
+      content: ''; 
+      position: absolute; 
+      top: 3px; 
+      left: 3px; 
+      width: 20px; 
+      height: 20px; 
+      background: var(--text-muted); 
+      border-radius: 50%; 
+      transition: all 0.3s; 
+    }
+
+    .toggle.active { 
+      background: var(--accent); 
+    }
+
+    .toggle.active::after { 
+      left: 27px; 
+      background: var(--bg-app); 
+    }
+  </style>
+</head>
+<body data-theme="pink">
+
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        LagBreaker
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item active" data-target="dashboard-view">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+          </svg>
+          Дашборд
+        </li>
+        <li class="nav-item" data-target="games-view">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          Мои Игры
+        </li>
+        <li class="nav-item" data-target="settings-view">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="color: var(--secondary-icon)" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Темы и Настройки
+        </li>
+      </ul>
+    </div>
+
+    <!-- БЫСТРОЕ ПЕРЕКЛЮЧЕНИЕ ТЕМ -->
+    <div class="sidebar-themes">
+      <div class="sidebar-themes-title">Тема оформления</div>
+      <div class="theme-dots">
+        <div class="theme-dot active" data-set-theme="pink" title="Cyber Pink" style="background: linear-gradient(135deg, #ff3b9a, #6c1cd1);"></div>
+        <div class="theme-dot" data-set-theme="gold" title="Luxury Gold" style="background: linear-gradient(135deg, #f7c948, #8a680d);"></div>
+        <div class="theme-dot" data-set-theme="orange" title="Sunset Orange" style="background: linear-gradient(135deg, #ff8c3b, #8f3405);"></div>
+        <div class="theme-dot" data-set-theme="green" title="Cyber Green" style="background: linear-gradient(135deg, #00ff88, #056b3a);"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <!-- ЭКРАН 1: ДАШБОРД -->
+    <div id="dashboard-view" class="view-section active">
+      <header class="header">
+        <div>
+          <p style="color: var(--text-muted); font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; letter-spacing: 0.5px;">ВЫБРАННАЯ ИГРА</p>
+          <div class="game-picker-row">
+            <select id="game-select" class="game-title">
+              <option value="Valorant">Valorant</option>
+              <option value="Dota 2">Dota 2</option>
+              <option value="Minecraft">Minecraft</option>
+            </select>
+            <button id="launch-game-btn" class="launch-btn" title="Запустить выбранную игру">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span id="launch-btn-text">ИГРАТЬ</span>
+            </button>
+          </div>
+        </div>
+        <div class="controls-row">
+          <select class="selector" id="profile">
+            <option value="wg0-client-casus">Профиль: casus</option>
+            <option value="wg0-client-Merc1less">Профиль: Merc1less</option>
+            <option value="wg0-client-metr1um">Профиль: metr1um</option>
+            <option value="wg0-client-Venarus">Профиль: Venarus</option>
+          </select>
+          <select class="selector">
+            <option>Нода: 153.52.103.150</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        <div class="card boost-card">
+          <div class="power-btn-wrap">
+            <button id="boost-btn" class="power-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+              </svg>
+            </button>
+            <div class="ripple"></div>
+          </div>
+          <div class="status-text" id="status-text">Ожидание...</div>
+          <div class="status-sub" id="status-sub">Нажмите для запуска туннеля</div>
+        </div>
+
+        <div class="card network-card">
+          <div class="card-title">Маршрутизация трафика</div>
+          <div class="route-visual">
+            <div class="node">
+              <div class="node-icon">ПК</div>
+              <div class="node-label">Твой ПК</div>
+            </div>
+            <div class="line-container">
+              <div class="line-fill"></div>
+              <div class="ping-badge">WireGuard</div>
+            </div>
+            <div class="node">
+              <div class="node-icon">VPS</div>
+              <div class="node-label">153.52.103.150</div>
+            </div>
+            <div class="line-container">
+              <div class="line-fill" style="transition-delay: 0.2s;"></div>
+              <div class="ping-badge" style="transition-delay: 0.2s;">Boosted</div>
+            </div>
+            <div class="node">
+              <div class="node-icon">Игра</div>
+              <div class="node-label">Riot / Valve</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card stats-card">
+          <div class="card-title">Телеметрия сети</div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div style="font-size: 0.75rem; color: var(--text-muted)">Туннель</div>
+              <div class="stat-val" id="total-ping">OFF</div>
+            </div>
+            <div class="stat-box">
+              <div style="font-size: 0.75rem; color: var(--text-muted)">MTU</div>
+              <div class="stat-val">1280</div>
+            </div>
+            <div class="stat-box">
+              <div style="font-size: 0.75rem; color: var(--text-muted)">NAT</div>
+              <div class="stat-val" style="color: var(--accent)">Open</div>
+            </div>
+          </div>
+          <div class="chart-container" id="chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ЭКРАН 2: МОИ ИГРЫ -->
+    <div id="games-view" class="view-section">
+      <h2 style="font-size: 2rem; font-weight: 800;">Библиотека игр</h2>
+      <p style="color: var(--text-muted); margin-top: 5px;">Нажми на карточку, чтобы выбрать и сразу запустить игру.</p>
+      <div class="games-grid">
+        
+        <div class="game-card" data-game="Valorant">
+          <div class="game-banner" style="background: linear-gradient(135deg, #fa4454, #9e1b28);">
+            <svg viewBox="0 0 24 24"><path d="M23.792 2.152a.252.252 0 0 0-.448-.147L15.11 12.3a.75.75 0 0 0 .587 1.218h5.702a.75.75 0 0 0 .588-.283l1.644-2.062a.75.75 0 0 0 .161-.466V2.152zM.656 2.006a.252.252 0 0 0-.448.146v8.932c0 .17.057.334.162.467l8.106 10.168a.75.75 0 0 0 .587.281h5.704a.75.75 0 0 0 .587-1.218L.656 2.006z"/></svg>
+          </div>
+          <h3>Valorant</h3>
+          <div class="game-card-sub">▶ Запустить Riot Client</div>
+        </div>
+        
+        <div class="game-card" data-game="Dota 2">
+          <div class="game-banner" style="background: linear-gradient(135deg, #c2352d, #701611);">
+            <svg viewBox="0 0 24 24"><path d="M21.5 2.5h-19v19h19v-19zm-14.8 3.2c1.1-.5 2.3.3 2.3 1.5s-1.2 2-2.3 1.5c-1.1-.5-1.1-2.5 0-3zm11.1 12.6c-.8.8-2.2.8-3 0l-9.1-9.1c-.8-.8-.8-2.2 0-3 .8-.8 2.2-.8 3 0l9.1 9.1c.8.8.8 2.2 0 3zm.5-9.6c-1.1.5-2.3-.3-2.3-1.5s1.2-2 2.3-1.5c1.1.5 1.1 2.5 0 3z"/></svg>
+          </div>
+          <h3>Dota 2</h3>
+          <div class="game-card-sub">▶ Запустить в Steam</div>
+        </div>
+        
+        <div class="game-card" data-game="Minecraft">
+          <div class="game-banner" style="background: linear-gradient(135deg, #739c4a, #3d5921);">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 11.5l-9-4.5v9l9 4.5 9-4.5v-9l-9 4.5z"/></svg>
+          </div>
+          <h3>Minecraft</h3>
+          <div class="game-card-sub">▶ Запустить лаунчер</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ЭКРАН 3: ТЕМЫ И НАСТРОЙКИ -->
+    <div id="settings-view" class="view-section">
+      <h2 style="font-size: 2rem; font-weight: 800;">Темы оформления</h2>
+      <p style="color: var(--text-muted); margin-top: 5px;">Выбери цветовую схему интерфейса (сохраняется автоматически).</p>
+
+      <div class="themes-grid">
+        <div class="theme-card active" data-set-theme="pink">
+          <div class="theme-preview" style="background: radial-gradient(circle, #ff3b9a 30%, #260d47 100%);"></div>
+          <div class="theme-name">Cyber Pink</div>
+        </div>
+        <div class="theme-card" data-set-theme="gold">
+          <div class="theme-preview" style="background: radial-gradient(circle, #f7c948 30%, #2b230d 100%);"></div>
+          <div class="theme-name">Luxury Gold</div>
+        </div>
+        <div class="theme-card" data-set-theme="orange">
+          <div class="theme-preview" style="background: radial-gradient(circle, #ff8c3b 30%, #361708 100%);"></div>
+          <div class="theme-name">Sunset Orange</div>
+        </div>
+        <div class="theme-card" data-set-theme="green">
+          <div class="theme-preview" style="background: radial-gradient(circle, #00ff88 30%, #0d261a 100%);"></div>
+          <div class="theme-name">Cyber Green</div>
+        </div>
+      </div>
+
+      <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">Системные параметры</h3>
+      <div class="settings-list">
+        <div class="setting-item">
+          <div>
+            <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Фиксация игрового пакета (MTU 1280)</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Исключает потерю пакетов и бесконечную загрузку сайтов.</p>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="setting-item">
+          <div>
+            <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Глубокая очистка служб WireGuard</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Автоматически удаляет зависшие драйверы из реестра служб Windows.</p>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
